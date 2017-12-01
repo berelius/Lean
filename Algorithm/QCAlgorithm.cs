@@ -37,6 +37,7 @@ using QuantConnect.Securities.Option;
 using QuantConnect.Statistics;
 using QuantConnect.Util;
 using System.Collections.Concurrent;
+using QuantConnect.Algorithm.Framework.Signals;
 using QuantConnect.Securities.Future;
 using QuantConnect.Securities.Crypto;
 
@@ -153,6 +154,11 @@ namespace QuantConnect.Algorithm
 
             OptionChainProvider = new EmptyOptionChainProvider();
         }
+
+        /// <summary>
+        /// Event fired when the algorithm generates signals
+        /// </summary>
+        public event AlgorithmEvent<SignalCollection> SignalsGenerated;
 
         /// <summary>
         /// Security collection is an array of the security objects such as Equities and FOREX. Securities data
@@ -1826,6 +1832,15 @@ namespace QuantConnect.Algorithm
         public void SetStatus(AlgorithmStatus status)
         {
             Status = status;
+        }
+
+        /// <summary>
+        /// Event invocator for the <see cref="SignalsGenerated"/> event
+        /// </summary>
+        /// <param name="signals">The collection of signals generaed at the current time step</param>
+        protected virtual void OnSignalsGenerated(IEnumerable<ISignal> signals)
+        {
+            SignalsGenerated?.Invoke(this, new SignalCollection(UtcTime, signals));
         }
     }
 }
